@@ -8,6 +8,7 @@ var MyDollar, $;
     var getType,
         arrayUnique,
         arrayRemoveElement,
+        isEmptyObject,
         myEventListeners,
         MyRealDollar;
 
@@ -25,6 +26,10 @@ var MyDollar, $;
         return arr.filter(function(i) {
             return i !== key;
         });
+    };
+
+    isEmptyObject = function(obj) {
+        return Object.keys(obj).length === 0;
     };
 
     myEventListeners = {};
@@ -417,13 +422,59 @@ var MyDollar, $;
         },
 
         click : function(callback, eventName) {
-            this.on('click', callback, eventName);
-            return this;
-        }/*,
-        // TODO
-        css : function(propertyName, value) {
+            return this.on('click', callback, eventName);
+        },
 
-        }*/
+        css : function(mix, value) {
+            var i,
+                k = this.length,
+                x,
+                y,
+                prop,
+                ret = null,
+                retAttribute,
+                retObj = {},
+                computedStyle,
+                mixType = getType(mix);
+            if (value === undefined && mixType !== '[object Object]') {
+                computedStyle = window.getComputedStyle(this[0]);
+                if (mixType === '[object Array]') {
+                    y = mix.length;
+                    for (x = 0; x < y; x++) {
+                        retAttribute = computedStyle.getPropertyValue(mix[x]);
+                        if (retAttribute !== null) {
+                            retObj[mix[x]] = retAttribute;
+                        }
+                    }
+                    ret = retObj;
+                } else {
+                    retAttribute = computedStyle.getPropertyValue(mix);
+                    if (retAttribute !== null) {
+                        ret = retAttribute;
+                    } else {
+                        ret = '';
+                    }
+                }
+            } else {
+                for (i = 0; i < k; i++) {
+                    if (mixType === '[object Object]') {
+                        for (prop in mix) {
+                            if (mix.hasOwnProperty(prop)) {
+                                this[0].style.removeProperty(prop, mix[prop]);
+                                this[0].style.setProperty(prop, mix[prop]);
+                            }
+                        }
+                    } else {
+                        this[0].style.removeProperty(mix);
+                        this[0].style.setProperty(mix, value);
+                    }
+                    if (this[0].getAttribute('style') === '') {
+                        this[0].removeAttribute('style');
+                    }
+                }
+            }
+            return ret !== null ? ret : this;
+        }
 
     };
 
@@ -470,6 +521,10 @@ var MyDollar, $;
 
     $.getType = function(el) {
         return getType(el);
+    };
+
+    $.isEmptyObject = function(obj) {
+        return isEmptyObject(obj);
     };
 
 }());
