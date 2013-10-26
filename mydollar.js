@@ -432,25 +432,25 @@ var MyDollar, $;
                 y,
                 prop,
                 ret = null,
-                retAttribute,
                 retObj = {},
                 computedStyle,
+                computedValue,
                 mixType = getType(mix);
             if (value === undefined && mixType !== '[object Object]') {
                 computedStyle = window.getComputedStyle(this[0]);
                 if (mixType === '[object Array]') {
                     y = mix.length;
                     for (x = 0; x < y; x++) {
-                        retAttribute = computedStyle.getPropertyValue(mix[x]);
-                        if (retAttribute !== null) {
-                            retObj[mix[x]] = retAttribute;
+                        computedValue = computedStyle.getPropertyValue(mix[x]);
+                        if (computedValue !== null) {
+                            retObj[mix[x]] = computedValue;
                         }
                     }
                     ret = retObj;
                 } else {
-                    retAttribute = computedStyle.getPropertyValue(mix);
-                    if (retAttribute !== null) {
-                        ret = retAttribute;
+                    computedValue = computedStyle.getPropertyValue(mix);
+                    if (computedValue !== null) {
+                        ret = computedValue;
                     } else {
                         ret = '';
                     }
