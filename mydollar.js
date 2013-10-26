@@ -1,4 +1,4 @@
-var $;
+var MyDollar, $;
 (function() {
     "use strict";
     /*jslint browser: true */
@@ -9,7 +9,7 @@ var $;
         arrayUnique,
         arrayRemoveElement,
         myEventListeners,
-        MyDollar;
+        myDollar;
 
     getType = function(mix) {
         return Object.prototype.toString.call(mix);
@@ -29,7 +29,11 @@ var $;
 
     myEventListeners = {};
 
-    MyDollar = function(selector) {
+    MyDollar = $ = function(selector) {
+        return new myDollar(selector);
+    };
+
+    myDollar = function(selector) {
         if (getType(selector) === '[object HTMLDocument]') {
             selector = 'body';
         }
@@ -44,13 +48,15 @@ var $;
         return this;
     };
 
-    MyDollar.fn = MyDollar.prototype = {
+    MyDollar.fn = myDollar.prototype = {
+
         ready : function(callback) {
             if (this.nodeType === '[object HTMLBodyElement]') {
                 document.addEventListener('DOMContentLoaded', callback, false);
             }
             return this;
         },
+
         on : function(event, callback, eventName) {
             var i,
                 k = this.length;
@@ -66,6 +72,7 @@ var $;
             }
             return this;
         },
+
         off : function (event, eventName) {
             var i,
                 k = this.length;
@@ -77,6 +84,7 @@ var $;
             }
             return this;
         },
+
         attr : function(mix, value) {
             var i,
                 k = this.length,
@@ -121,6 +129,7 @@ var $;
             }
             return this;
         },
+
         hasClass : function(className) {
             var i,
                 k = this.length,
@@ -148,6 +157,7 @@ var $;
             }
             return ret;
         },
+
         addClass : function(mix) {
             var i,
                 k = this.length,
@@ -175,6 +185,7 @@ var $;
             }
             return this;
         },
+
         removeClass : function(mix) {
             var i,
                 k = this.length,
@@ -203,6 +214,7 @@ var $;
             }
             return this;
         },
+
         data : function(mix, value) {
             var i,
                 k = this.length,
@@ -228,6 +240,7 @@ var $;
             }
             return ret !== null ? ret : this;
         },
+
         removeData : function(mix) {
             var i,
                 k = this.length,
@@ -259,6 +272,7 @@ var $;
             }
             return this;
         },
+
         html : function(mix) {
             var i,
                 k = this.length,
@@ -277,6 +291,7 @@ var $;
             }
             return ret || this;
         },
+
         empty : function () {
             var i,
                 k = this.length;
@@ -300,6 +315,7 @@ var $;
             }
             return ret !== null ? ret : this;
         },
+
         append : function(el) {
             var elIsHTMLObj = getType(el).substring(0, 12) === '[object HTML' ? true : false,
                 elObj,
@@ -311,6 +327,7 @@ var $;
             }
             return this;
         },
+
         prepend : function(el) {
             var elIsHTMLObj = getType(el).substring(0, 12) === '[object HTML' ? true : false,
                 elObj,
@@ -322,6 +339,7 @@ var $;
             }
             return this;
         },
+
         before : function(el) {
             var elIsHTMLObj = getType(el).substring(0, 12) === '[object HTML' ? true : false,
                 elObj,
@@ -333,6 +351,7 @@ var $;
             }
             return this;
         },
+
         after : function(el) {
             var elIsHTMLObj = getType(el).substring(0, 12) === '[object HTML' ? true : false,
                 elObj,
@@ -344,6 +363,7 @@ var $;
             }
             return this;
         },
+
         remove: function(selector) {
             var i,
                 k;
@@ -361,6 +381,7 @@ var $;
             }
             return this;
         },
+
         hide: function() {
             var i,
                 k = this.length;
@@ -369,6 +390,7 @@ var $;
             }
             return this;
         },
+
         show: function(type) {
             type = type || '';
             var i,
@@ -380,15 +402,17 @@ var $;
                 }
             }
             return this;
-        }
-    };
+        },
 
-    /**
-     * @param {String} selector
-     * @return {nsIDOMNodeList}
-     */
-    $ = function(selector) {
-        return new MyDollar(selector);
+        toggle: function() {
+            var i,
+                k = this.length;
+            for (i = 0; i < k; i++) {
+                this[i].style.display = this[i].style.display === 'none' ? '' : 'none';
+            }
+            return this;
+        }
+
     };
 
     $.log = function() {
@@ -437,5 +461,3 @@ var $;
     };
 
 }());
-
-
