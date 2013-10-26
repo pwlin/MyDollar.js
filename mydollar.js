@@ -9,7 +9,7 @@ var MyDollar, $;
         arrayUnique,
         arrayRemoveElement,
         myEventListeners,
-        myDollar;
+        MyRealDollar;
 
     getType = function(mix) {
         return Object.prototype.toString.call(mix);
@@ -30,16 +30,19 @@ var MyDollar, $;
     myEventListeners = {};
 
     MyDollar = $ = function(selector) {
-        return new myDollar(selector);
+        return new MyRealDollar(selector);
     };
 
-    myDollar = function(selector) {
-        if (getType(selector) === '[object HTMLDocument]') {
+    MyRealDollar = function(selector) {
+        var selectorType = getType(selector),
+            nodes,
+            i,
+            k;
+        if (selectorType === '[object HTMLDocument]') {
             selector = 'body';
         }
-        var nodes = document.querySelectorAll(selector),
-            i,
-            k = nodes.length;
+        nodes = document.querySelectorAll(selector);
+        k = nodes.length;
         for (i = 0; i < k; i++) {
             this[i] = nodes[i];
         }
@@ -48,7 +51,7 @@ var MyDollar, $;
         return this;
     };
 
-    MyDollar.fn = myDollar.prototype = {
+    MyDollar.fn = MyRealDollar.prototype = {
 
         ready : function(callback) {
             if (this.nodeType === '[object HTMLBodyElement]') {
@@ -279,7 +282,7 @@ var MyDollar, $;
                 ret = null,
                 mixType = typeof mix;
             if (mix === undefined) {
-                ret = this[0].innerHTML;
+                ret = this[0].innerHTML || '';
             } else if (mixType === 'function') {
                 for (i = 0; i < k; i++) {
                     this[i].innerHTML = mix(i, this[i].innerHTML);
@@ -289,7 +292,7 @@ var MyDollar, $;
                     this[i].innerHTML = mix;
                 }
             }
-            return ret || this;
+            return ret !== null ? ret : this;
         },
 
         empty : function () {
@@ -411,7 +414,16 @@ var MyDollar, $;
                 this[i].style.display = this[i].style.display === 'none' ? '' : 'none';
             }
             return this;
-        }
+        },
+
+        click : function(callback, eventName) {
+            this.on('click', callback, eventName);
+            return this;
+        }/*,
+        // TODO
+        css : function(propertyName, value) {
+
+        }*/
 
     };
 
