@@ -98,7 +98,8 @@ var MyDollar, $;
                 k = this.length,
                 prop,
                 ret = null,
-                mixType = getType(mix);
+                mixType = getType(mix),
+                valueType = typeof value;
             if (value === undefined && mixType !== '[object Object]') {
                 ret = this[0].getAttribute(mix) || '';
             } else {
@@ -110,7 +111,7 @@ var MyDollar, $;
                             }
                         }
                     } else {
-                        this[i].setAttribute(mix, value);
+                        this[i].setAttribute(mix, valueType === 'function' ? value.apply(this[i], [i, this[i].getAttribute(mix)]) : value);
                     }
                 }
             }
@@ -171,6 +172,7 @@ var MyDollar, $;
                 y,
                 m,
                 n,
+                mixType = typeof mix,
                 mixed,
                 originalClasses = [],
                 originalClassesString = '',
@@ -180,14 +182,15 @@ var MyDollar, $;
                 originalClasses = originalClassesString.split(' ');
                 y = originalClasses.length;
                 for (x = 0; x < y; x++) {
-                    mixed = mix.split(' ');
+                    mixed = mixType === 'function' ? mix.apply(this[i], [i, originalClassesString]) : mix;
+                    mixed = mixed.split(' ');
                     n = mixed.length;
                     for (m = 0; m < n; m++) {
                         newClasses.push(mixed[m]);
                     }
                 }
                 newClasses = arrayUnique(originalClassesString.split(' ').concat(newClasses));
-                this[0].setAttribute('class', $.trim(newClasses.join(' ')));
+                this[i].setAttribute('class', $.trim(newClasses.join(' ')));
             }
             return this;
         },
@@ -197,6 +200,7 @@ var MyDollar, $;
                 k = this.length,
                 m,
                 n,
+                mixType = typeof mix,
                 mixed,
                 originalClasses = [],
                 originalClassesString = '';
@@ -206,13 +210,14 @@ var MyDollar, $;
                 } else {
                     originalClassesString = this[i].getAttribute('class') || '';
                     originalClasses = originalClassesString.split(' ');
-                    mixed = mix.split(' ');
+                    mixed = mixType === 'function' ? mix.apply(this[i], [i, originalClassesString]) : mix;
+                    mixed = mixed.split(' ');
                     n = mixed.length;
                     for (m = 0; m < n; m++) {
                         originalClasses = arrayRemoveElement(originalClasses, mixed[m]);
                     }
                     if (originalClasses.length > 0) {
-                        this[0].setAttribute('class', $.trim(originalClasses.join(' ')));
+                        this[i].setAttribute('class', $.trim(originalClasses.join(' ')));
                     } else {
                         this[i].removeAttribute('class');
                     }
@@ -286,13 +291,9 @@ var MyDollar, $;
                 mixType = typeof mix;
             if (mix === undefined) {
                 ret = this[0].innerHTML || '';
-            } else if (mixType === 'function') {
+            } else {
                 for (i = 0; i < k; i++) {
-                    this[i].innerHTML = mix(i, this[i].innerHTML);
-                }
-            } else if (mixType === 'string') {
-                for (i = 0; i < k; i++) {
-                    this[i].innerHTML = mix;
+                    this[i].innerHTML = mixType === 'function' ? mix.apply(this[i], [i, this[i].innerHTML]) : mix;
                 }
             }
             return ret !== null ? ret : this;
@@ -312,12 +313,13 @@ var MyDollar, $;
         val : function (value) {
             var ret = null,
                 i,
-                k = this.length;
+                k = this.length,
+                valueType = typeof value;
             if (value === undefined) {
                 ret = this[0].value || '';
             } else {
                 for (i = 0; i < k; i++) {
-                    this[i].value = value;
+                    this[i].value = valueType === 'function' ? value.apply(this[i], [i, this[i].value]) : value;
                 }
             }
             return ret !== null ? ret : this;
@@ -411,11 +413,12 @@ var MyDollar, $;
             return this;
         },
 
-        toggle: function() {
+        toggle: function(type) {
+            type = type || '';
             var i,
                 k = this.length;
             for (i = 0; i < k; i++) {
-                this[i].style.display = this[i].style.display === 'none' ? '' : 'none';
+                this[i].style.display = this[i].style.display === 'none' ? type : 'none';
             }
             return this;
         },
@@ -434,7 +437,8 @@ var MyDollar, $;
                 retObj = {},
                 computedStyle,
                 computedValue,
-                mixType = getType(mix);
+                mixType = getType(mix),
+                valueType = typeof value;
             if (value === undefined && mixType !== '[object Object]') {
                 computedStyle = window.getComputedStyle(this[0]);
                 if (mixType === '[object Array]') {
@@ -459,16 +463,18 @@ var MyDollar, $;
                     if (mixType === '[object Object]') {
                         for (prop in mix) {
                             if (mix.hasOwnProperty(prop)) {
-                                this[0].style.removeProperty(prop, mix[prop]);
-                                this[0].style.setProperty(prop, mix[prop]);
+                                this[i].style.removeProperty(prop, mix[prop]);
+                                this[i].style.setProperty(prop, mix[prop]);
                             }
                         }
                     } else {
-                        this[0].style.removeProperty(mix);
-                        this[0].style.setProperty(mix, value);
+                        computedStyle = window.getComputedStyle(this[i]);
+                        computedValue = computedStyle.getPropertyValue(mix) || '';
+                        this[i].style.removeProperty(mix);
+                        this[i].style.setProperty(mix, valueType === 'function' ? value.apply(this[i], [i, computedValue]) : value);
                     }
-                    if (this[0].getAttribute('style') === '') {
-                        this[0].removeAttribute('style');
+                    if (this[i].getAttribute('style') === '') {
+                        this[i].removeAttribute('style');
                     }
                 }
             }
