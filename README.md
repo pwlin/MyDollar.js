@@ -126,11 +126,11 @@ Current functions
 
 ###.click()###
    
-   $( selector ).click( handler(eventObject), eventName ); 
-   $( selector ).click( handler(eventObject) );
-   // TODO:
-   $( selector ).click( eventData, handler(eventObject) );
-   $( selector ).click();
+    $( selector ).click( handler(eventObject), eventName ); 
+    $( selector ).click( handler(eventObject) );
+    // TODO:
+    $( selector ).click( eventData, handler(eventObject) );
+    $( selector ).click();
    
 ###.css()###
 
