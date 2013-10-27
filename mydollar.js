@@ -118,6 +118,7 @@ var MyDollar, $;
             }
             return ret !== null ? ret : this;
         },
+
         removeAttr : function(mix) {
             var i,
                 k = this.length,
@@ -310,6 +311,7 @@ var MyDollar, $;
             }
             return this;
         },
+
         val : function (value) {
             var ret = null,
                 i,
