@@ -58,23 +58,23 @@ var MyDollar, $;
 
     MyDollar.fn = MyRealDollar.prototype = {
 
-        ready : function(callback) {
+        ready : function(handler) {
             if (this.nodeType === '[object HTMLBodyElement]') {
-                document.addEventListener('DOMContentLoaded', callback, false);
+                document.addEventListener('DOMContentLoaded', handler, false);
             }
             return this;
         },
 
-        on : function(event, callback, eventName) {
+        on : function(event, handler, eventName) {
             var i,
                 k = this.length;
             for (i = 0; i < k; i++) {
                 if (eventName === undefined) {
-                    this[i].addEventListener(event, callback);
+                    this[i].addEventListener(event, handler);
                 } else {
                     this[i].removeEventListener(event, myEventListeners[eventName + '-' + i]);
                     delete myEventListeners[eventName + '-' + i];
-                    myEventListeners[eventName + '-' + i] = callback;
+                    myEventListeners[eventName + '-' + i] = handler;
                     this[i].addEventListener(event, myEventListeners[eventName + '-' + i]);
                 }
             }
@@ -423,8 +423,8 @@ var MyDollar, $;
             return this;
         },
 
-        click : function(callback, eventName) {
-            return this.on('click', callback, eventName);
+        click : function(handler, eventName) {
+            return this.on('click', handler, eventName);
         },
 
         css : function(mix, value) {
@@ -484,7 +484,7 @@ var MyDollar, $;
         console.log(arguments);
     };
 
-    $.each = function(mix, callback, type) {
+    $.each = function(mix, handler, type) {
         if (mix !== undefined) {
             var i,
                 k,
@@ -493,13 +493,13 @@ var MyDollar, $;
             if (type === '[object Object]') {
                 for (prop in mix) {
                     if (mix.hasOwnProperty(prop)) {
-                        callback(prop, mix[prop]);
+                        handler(prop, mix[prop]);
                     }
                 }
             } else if (type === '[object Array]' || type === '[object NodeList]') {
                 k = mix.length;
                 for (i = 0; i < k; i++) {
-                    callback(i, mix[i]);
+                    handler(i, mix[i]);
                 }
             }
         }
