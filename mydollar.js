@@ -10,7 +10,7 @@ var MyDollar, $;
         arrayRemoveElement,
         isEmptyObject,
         myEventListeners,
-        MyRealDollar;
+        MyD;
 
     getType = function(mix) {
         return Object.prototype.toString.call(mix);
@@ -35,10 +35,10 @@ var MyDollar, $;
     myEventListeners = {};
 
     MyDollar = $ = function(selector) {
-        return new MyRealDollar(selector);
+        return new MyD(selector);
     };
 
-    MyRealDollar = function(selector) {
+    MyD = function(selector) {
         var selectorType = getType(selector),
             nodes,
             i,
@@ -56,7 +56,7 @@ var MyDollar, $;
         return this;
     };
 
-    MyDollar.fn = MyRealDollar.prototype = {
+    MyDollar.fn = MyD.prototype = {
 
         ready : function(handler) {
             if (this.nodeType === '[object HTMLBodyElement]') {
@@ -102,16 +102,14 @@ var MyDollar, $;
             if (value === undefined && mixType !== '[object Object]') {
                 ret = this[0].getAttribute(mix) || '';
             } else {
-                if (mixType === '[object Object]') {
-                    for (i = 0; i < k; i++) {
+                for (i = 0; i < k; i++) {
+                    if (mixType === '[object Object]') {
                         for (prop in mix) {
                             if (mix.hasOwnProperty(prop)) {
                                 this[i].setAttribute(prop, mix[prop]);
                             }
                         }
-                    }
-                } else {
-                    for (i = 0; i < k; i++) {
+                    } else {
                         this[i].setAttribute(mix, value);
                     }
                 }
@@ -123,16 +121,15 @@ var MyDollar, $;
             var i,
                 k = this.length,
                 x,
-                y;
-            if (getType(mix) === '[object Array]') {
-                for (i = 0; i < k; i++) {
+                y,
+                mixType = getType(mix);
+            for (i = 0; i < k; i++) {
+                if (mixType === '[object Array]') {
                     y = mix.length;
                     for (x = 0; x < y; x++) {
                         this[i].removeAttribute(mix[x]);
                     }
-                }
-            } else {
-                for (i = 0; i < k; i++) {
+                } else {
                     this[i].removeAttribute(mix);
                 }
             }
