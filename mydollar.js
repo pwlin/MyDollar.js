@@ -1,15 +1,14 @@
 var MyDollar, $;
 (function() {
     "use strict";
-    /*jslint browser: true */
-    /*jslint plusplus: true */
-    /*jslint todo: true */
-    /*global console */
+    /*jslint browser:true, plusplus:true, todo:true*/
+    /*global console*/
     var getType,
         arrayUnique,
         arrayRemoveElement,
         isEmptyObject,
         myEventListeners,
+        consoleType = typeof console,
         MyD;
 
     getType = function(mix) {
@@ -43,10 +42,13 @@ var MyDollar, $;
             nodes,
             i,
             k;
-        if (selectorType === '[object HTMLDocument]') {
-            selector = 'body';
+        if (selectorType.substring(0, 12) === '[object HTML') {
+            nodes = [selector];
+        } else if (selector === window) {
+            nodes = [window];
+        } else {
+            nodes = document.querySelectorAll(selector);
         }
-        nodes = document.querySelectorAll(selector);
         k = nodes.length;
         for (i = 0; i < k; i++) {
             this[i] = nodes[i];
@@ -59,23 +61,22 @@ var MyDollar, $;
     MyDollar.fn = MyD.prototype = {
 
         ready : function(handler) {
-            if (this.nodeType === '[object HTMLBodyElement]') {
-                document.addEventListener('DOMContentLoaded', handler, false);
-            }
+            this[0].addEventListener('DOMContentLoaded', handler, false);
             return this;
         },
 
         on : function(event, handler, eventName) {
             var i,
-                k = this.length;
+                k = this.length,
+                eventNameSuffix = '-on';
             for (i = 0; i < k; i++) {
                 if (eventName === undefined) {
                     this[i].addEventListener(event, handler);
                 } else {
-                    this[i].removeEventListener(event, myEventListeners[eventName + '-' + i]);
-                    delete myEventListeners[eventName + '-' + i];
-                    myEventListeners[eventName + '-' + i] = handler;
-                    this[i].addEventListener(event, myEventListeners[eventName + '-' + i]);
+                    this[i].removeEventListener(event, myEventListeners[eventName + '-' + i + '-' + eventNameSuffix]);
+                    delete myEventListeners[eventName + '-' + i + '-' + eventNameSuffix];
+                    myEventListeners[eventName + '-' + i + '-' + eventNameSuffix] = handler;
+                    this[i].addEventListener(event, myEventListeners[eventName + '-' + i + '-' + eventNameSuffix]);
                 }
             }
             return this;
@@ -83,14 +84,43 @@ var MyDollar, $;
 
         off : function (event, eventName) {
             var i,
-                k = this.length;
+                k = this.length,
+                eventNameSuffix = '-on';
             if (eventName !== undefined) {
                 for (i = 0; i < k; i++) {
-                    this[i].removeEventListener(event, myEventListeners[eventName + '-' + i]);
-                    delete myEventListeners[eventName + '-' + i];
+                    this[i].removeEventListener(event, myEventListeners[eventName + '-' + i + '-' + eventNameSuffix]);
+                    delete myEventListeners[eventName + '-' + i + '-' + eventNameSuffix];
                 }
             }
             return this;
+        },
+
+        one : function (event, handler, eventName) {
+            var i,
+                k = this.length,
+                eventNameSuffix = '-one',
+                makeHandler = function(element1, event1, handler1, eventName1) {
+                    return function (e) {
+                        handler1.apply(element1, [e]);
+                        element1.removeEventListener(event1, myEventListeners[eventName1]);
+                        delete myEventListeners[eventName1];
+                    };
+                };
+            for (i = 0; i < k; i++) {
+                this[i].removeEventListener(event, myEventListeners[eventName + '-' + i + '-' + eventNameSuffix]);
+                delete myEventListeners[eventName + '-' + i + '-' + eventNameSuffix];
+                myEventListeners[eventName + '-' + i + '-' + eventNameSuffix] = makeHandler(this[i], event, handler, eventName + '-' + i + '-' + eventNameSuffix);
+                this[i].addEventListener(event, myEventListeners[eventName + '-' + i + '-' + eventNameSuffix]);
+            }
+            return this;
+        },
+
+        each : function(handler) {
+            var i,
+                k = this.length;
+            for (i = 0; i < k; i++) {
+                handler.apply(this[i]);
+            }
         },
 
         attr : function(mix, value) {
@@ -373,20 +403,11 @@ var MyDollar, $;
             return this;
         },
 
-        remove: function(selector) {
+        remove: function() {
             var i,
-                k;
-            if (selector === undefined) {
                 k = this.length;
-                for (i = 0; i < k; i++) {
-                    this[i].parentNode.removeChild(this[i]);
-                }
-            } else {
-                selector = $(selector);
-                k = selector.length;
-                for (i = 0; i < k; i++) {
-                    selector[i].parentNode.removeChild(selector[i]);
-                }
+            for (i = 0; i < k; i++) {
+                this[i].parentNode.removeChild(this[i]);
             }
             return this;
         },
@@ -484,7 +505,9 @@ var MyDollar, $;
     };
 
     $.log = function() {
-        console.log(arguments);
+        if (consoleType !== undefined) {
+            console.log(arguments);
+        }
     };
 
     $.each = function(mix, handler, type) {
@@ -530,6 +553,11 @@ var MyDollar, $;
 
     $.isEmptyObject = function(obj) {
         return isEmptyObject(obj);
+    };
+
+    $.uniqId = function() {
+        var letter = String.fromCharCode(65 + Math.floor(Math.random() * 26));
+        return letter + '-' + new Date().valueOf();
     };
 
 }());
