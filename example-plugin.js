@@ -1,7 +1,7 @@
 (function() {
     "use strict";
-    /*jslint browser: true */
-    /*jslint plusplus: true */
+    /*jslint browser: true, plusplus: true */
+    /*global $ */
     $.fn.fontColor = function(color) {
         var i,
             k = this.length;
