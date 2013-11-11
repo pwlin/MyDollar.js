@@ -18,6 +18,14 @@ Current functions
 
     $( selector ).off( event, eventName );
     
+###.one()###
+
+    $( selector ).one( event, handler, eventName );
+   
+###.each()###
+
+    $( selector ).each( handler );
+
 ###.attr()###
 
     $( selector ).attr( attributeName );
@@ -108,7 +116,6 @@ Current functions
 ###.remove()###
     
     $( selector ).remove();
-    $( selector ).remove( anotherSelector );
 
 ###.hide()###
 
