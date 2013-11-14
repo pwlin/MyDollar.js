@@ -147,3 +147,17 @@ Current functions
     $( selector ).css( propertyName, function(index, value) );
     $( selector ).css( properties );
     
+Helper functions
+=========
+
+###$.ajax()###
+    
+    var settings = {
+        complete : function(xhr) {},
+        error : function(message, xhr) {},
+        headers: {'Connection': 'close'},
+        data: {'mykey' : 'myvalue},
+        method: 'POST',
+        timeout : 10000
+    };    
+    $.ajax(url, settings);
