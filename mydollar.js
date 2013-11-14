@@ -559,5 +559,61 @@ var MyDollar, $;
         var letter = String.fromCharCode(65 + Math.floor(Math.random() * 26));
         return letter + '-' + new Date().valueOf();
     };
+    
+    /**
+     * @param {String} url
+     * @param {Object} settings
+     */
+    $.ajax = function(url, settings) {
+        var requestTimeout,
+            xhReq = new XMLHttpRequest(),
+            formData = null;
+        settings = settings || {};
+        settings.complete = settings.complete || function() { return false; };
+        settings.error = settings.error || function() { return false; };
+        settings.timeout = settings.timeout || 10000;
+        settings.method = settings.method || 'get';
+        settings.method = settings.method.toUpperCase();
+        settings.headers = settings.headers || null;
+        settings.data = settings.data || null;
+        if (settings.data !== null) {
+            formData = [];
+            $.each(settings.data, function(k, v) {
+                formData.push(encodeURIComponent(k) + '=' + encodeURIComponent(v));
+            }, '[object Object]');
+            formData = formData.join('&');
+            if (settings.method === 'GET') {
+                url = url.indexOf('?') < 0 ? url + '?' + formData : url + '&' + formData; 
+            }
+        }
+        requestTimeout = setTimeout(function() {
+            xhReq.abort();
+            settings.error('Aborted by a timeout.', xhReq);
+        }, settings.timeout);
+
+        xhReq.onload = function() {
+            if (xhReq.status === 200) {
+                clearTimeout(requestTimeout);
+                settings.complete(xhReq.response);
+            }
+        };
+        xhReq.onerror = function() {
+            clearTimeout(requestTimeout);
+            settings.error('An error occurred.', xhReq);
+        };
+        xhReq.open(settings.method, url, true);
+        if (settings.headers !== null) {
+            $.each(settings.headers, function(k, v) {
+                xhReq.setRequestHeader(k, v);
+            }, '[object Object]');
+        }
+        xhReq.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+        if (settings.method === 'POST') {
+            xhReq.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        }
+        xhReq.send(formData);
+    };
+
 
 }());
+
