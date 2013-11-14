@@ -156,7 +156,7 @@ Helper functions
         complete : function(xhr) {},
         error : function(message, xhr) {},
         headers: {'Connection': 'close'},
-        data: {'mykey' : 'myvalue},
+        data: {'mykey' : 'myvalue'},
         method: 'POST',
         timeout : 10000
     };    
