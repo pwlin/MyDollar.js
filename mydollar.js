@@ -123,6 +123,11 @@ var MyDollar, $;
             }
         },
 
+        parent : function() {
+
+
+        },
+
         attr : function(mix, value) {
             var i,
                 k = this.length,
@@ -559,7 +564,7 @@ var MyDollar, $;
         var letter = String.fromCharCode(65 + Math.floor(Math.random() * 26));
         return letter + '-' + new Date().valueOf();
     };
-    
+
     /**
      * @param {String} url
      * @param {Object} settings
@@ -583,7 +588,7 @@ var MyDollar, $;
             }, '[object Object]');
             formData = formData.join('&');
             if (settings.method === 'GET') {
-                url = url.indexOf('?') < 0 ? url + '?' + formData : url + '&' + formData; 
+                url = url.indexOf('?') < 0 ? url + '?' + formData : url + '&' + formData;
             }
         }
         requestTimeout = setTimeout(function() {
