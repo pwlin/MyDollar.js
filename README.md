@@ -147,6 +147,12 @@ Current functions
     $( selector ).css( propertyName, function(index, value) );
     $( selector ).css( properties );
     
+###.parent()###
+
+    $( selector ).parent();
+    //TODO:
+    $( selector ).parent( anotherSelector )
+    
 Helper functions
 =========
 
