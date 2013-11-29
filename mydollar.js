@@ -132,6 +132,22 @@ var MyDollar, $;
             return this;
         },
 
+        get : function(index) {
+            if (index !== undefined) {
+                if (index < 0 || index > this.length) {
+                    index = this.length - 1;
+                }
+                return this[index];
+            }
+            var allNodes = [],
+                i,
+                k = this.length;
+            for (i = 0; i < k; i++) {
+                allNodes.push(this[i]);
+            }
+            return allNodes;
+        },
+
         attr : function(mix, value) {
             var i,
                 k = this.length,
@@ -569,6 +585,74 @@ var MyDollar, $;
         return letter + '-' + new Date().valueOf();
     };
 
+    $.get = function(url, mix1, mix2, mix3) {
+        if (mix1 !== undefined) {
+            var mix1Type = getType(mix1);
+            if (mix1Type === '[object String]') {
+                return $.ajax(url, {
+                    dataType : mix1
+                });
+            }
+            if (mix1Type === '[object Function]') {
+                return $.ajax(url, {
+                    complete : mix1,
+                    dataType : mix2 || null
+                });
+            }
+            if (mix1Type === '[object Object]') {
+                if (getType(mix2) === '[object Function]') {
+                    return $.ajax(url, {
+                        complete : mix2,
+                        data : mix1,
+                        dataType : mix3 || null
+                    });
+                }
+                return $.ajax(url, {
+                    data : mix1,
+                    dataType : mix2
+                });
+            }
+        }
+        return $.ajax(url, {});
+    };
+
+    $.getJSON = function(url, mix1, mix2) {
+        var mix1Type = getType(mix1);
+        if (mix1Type === '[object Function]') {
+            return $.ajax(url, {
+                complete : mix1,
+                dataType : 'json'
+            });
+        }
+        if (mix1Type === '[object Object]') {
+            if (getType(mix2) === '[object Function]') {
+                return $.ajax(url, {
+                    complete : mix2,
+                    data : mix1,
+                    dataType : 'json'
+                });
+            }
+            return $.ajax(url, {
+                data : mix1,
+                dataType : 'json'
+            });
+        }
+    };
+
+    $.getJSONP = function(url, mix1) {
+        return $.ajax(url, {
+            data : mix1,
+            dataType : 'jsonp'
+        });
+    };
+    
+    $.getScript = function(url, success) {
+        return $.ajax(url, {
+            complete : success,
+            dataType : 'script'
+        });
+    };
+
     /**
      * @param {String} url
      * @param {Object} settings
@@ -576,23 +660,35 @@ var MyDollar, $;
     $.ajax = function(url, settings) {
         var requestTimeout,
             xhReq = new XMLHttpRequest(),
-            formData = null;
+            formData = [];
         settings = settings || {};
         settings.complete = settings.complete || function() { return false; };
         settings.error = settings.error || function() { return false; };
         settings.timeout = settings.timeout || 10000;
-        settings.method = settings.method || 'get';
-        settings.method = settings.method.toUpperCase();
+        settings.method = settings.method ? settings.method.toUpperCase() : 'GET';
         settings.headers = settings.headers || null;
+        settings.dataType = settings.dataType || 'html';
         settings.data = settings.data || null;
+        settings.cache = settings.cache || true;
         if (settings.data !== null) {
-            formData = [];
             $.each(settings.data, function(k, v) {
+                if (k === 'myDollarElId') {
+                    return true;
+                }
                 formData.push(encodeURIComponent(k) + '=' + encodeURIComponent(v));
             }, '[object Object]');
+        }
+        if (settings.cache === false || settings.dataType === 'script' || settings.dataType === 'jsonp') {
+            formData.push('_=' + new Date().valueOf());
+        }
+        if (settings.method === 'GET' && formData.length !== 0) {
             formData = formData.join('&');
-            if (settings.method === 'GET') {
-                url = url.indexOf('?') < 0 ? url + '?' + formData : url + '&' + formData;
+            url = url.indexOf('?') < 0 ? url + '?' + formData : url + '&' + formData;
+        } else {
+            if (formData.lengh === 0) {
+                formData = null;
+            } else {
+                formData = formData.join('&');
             }
         }
         requestTimeout = setTimeout(function() {
@@ -603,7 +699,32 @@ var MyDollar, $;
         xhReq.onload = function() {
             if (xhReq.status === 200) {
                 clearTimeout(requestTimeout);
-                settings.complete(xhReq.response);
+                var finalResponse,
+                    el,
+                    oldEl;
+                switch (settings.dataType) {
+                case 'json':
+                    finalResponse = JSON.parse(xhReq.responseText);
+                    break;
+                case 'xml':
+                    finalResponse = xhReq.responseXML;
+                    break;
+                case 'jsonp':
+                case 'script':
+                    oldEl = document.getElementById(settings.data.myDollarElId);
+                    if (oldEl) {
+                        oldEl.parentNode.removeChild(oldEl);
+                    } else {
+                        settings.data.myDollarElId = settings.data.myDollarElId || $.uniqId();
+                    }
+                    el = $.el('script', {'id' : settings.data.myDollarElId, 'type' : 'text/javascript', 'html' : xhReq.responseText});
+                    document.getElementsByTagName('head')[0].appendChild(el);
+                    break;
+                default:
+                    finalResponse = xhReq.responseText;
+                    break;
+                }
+                settings.complete(finalResponse);
             }
         };
         xhReq.onerror = function() {

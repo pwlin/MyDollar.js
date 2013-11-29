@@ -151,8 +151,14 @@ Current functions
 
     $( selector ).parent();
     //TODO:
-    $( selector ).parent( anotherSelector )
+    $( selector ).parent( anotherSelector );
+
+###.get()###
+
+    $( selector ).get( index );
+    $( selector ).get();
     
+
 Helper functions
 =========
 
@@ -163,7 +169,26 @@ Helper functions
         error : function(message, xhr) {},
         headers: {'Connection': 'close'},
         data: {'mykey' : 'myvalue'},
-        method: 'POST',
+        method: 'GET',
         timeout : 10000
     };    
     $.ajax(url, settings);
+
+###$.get()###
+
+    $.get( url [, data ] [, success(data) ] [, dataType ] );
+
+###$.getJSON()###
+
+   $.getJSON( url [, data ] [, success(data) ] );
+    
+###$.getJSONP()###
+
+    $.getJSONP( url [, data ] );    
+    
+###$.getScript()###
+
+    $.getScript( url [, success(data) ] );
+
+
+ 
