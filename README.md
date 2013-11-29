@@ -180,7 +180,7 @@ Helper functions
 
 ###$.getJSON()###
 
-   $.getJSON( url [, data ] [, success(data) ] );
+    $.getJSON( url [, data ] [, success(data) ] );
     
 ###$.getJSONP()###
 
