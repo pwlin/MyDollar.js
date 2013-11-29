@@ -124,16 +124,10 @@ var MyDollar, $;
         },
 
         parent : function() {
-            var parents = [],
-                i,
+            var i,
                 k = this.length;
             for (i = 0; i < k; i++) {
-                parents.push(this[i].parentNode);
-            }
-            this.length = parents.length;
-            k = parents.length;
-            for (i = 0; i < k; i++) {
-                this[i] = parents[i];
+                this[i] = this[i].parentNode;
             }
             return this;
         },
