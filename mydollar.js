@@ -645,7 +645,7 @@ var MyDollar, $;
             dataType : 'jsonp'
         });
     };
-    
+
     $.getScript = function(url, success) {
         return $.ajax(url, {
             complete : success,
@@ -711,6 +711,7 @@ var MyDollar, $;
                     break;
                 case 'jsonp':
                 case 'script':
+                    settings.data = settings.data || {};
                     oldEl = document.getElementById(settings.data.myDollarElId);
                     if (oldEl) {
                         oldEl.parentNode.removeChild(oldEl);
