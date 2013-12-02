@@ -5,10 +5,10 @@
     var init;
 
     init = function() {
-        $(window).on ('hashchange', function() {
+        $(window).on('hashchange', function() {
             var id = window.location.hash.replace(/^#/, ''),
                 pages = $('div[data-role="page"]');
-            if (!document.getElementById(id)) {
+            if (!id || !document.getElementById(id)) {
                 return false;
             }
             pages.each(function() {
@@ -25,12 +25,11 @@
         pages.each(function() {
             this.style.display = 'none';
         });
-        if (id) {
-            document.title = $('#' + id + ' div[data-role="header"] h1').html();
-            document.getElementById(id).style.display = 'block';
-        } else {
-            $.mobile.changePage(pages.get(0).id);
+        if (!id || !document.getElementById(id)) {
+            id = pages.get(0).id;
         }
+        $.mobile.changePage('#' + $.uniqId);
+        $.mobile.changePage(id);
     };
 
     $.fn.hashchange = function(handler, eventName) {
@@ -39,7 +38,6 @@
     };
 
     $.mobile = {
-
         changePage : function(id) {
             window.location.hash = id;
         }
