@@ -2,71 +2,49 @@
     "use strict";
     /*jslint browser:true, plusplus:true*/
     /*global $*/
-    var mainContainer,
-        currentPage = null,
-        historyState = [];
-    
+    var init;
+
+    init = function() {
+        $(window).on ('hashchange', function() {
+            var id = window.location.hash.replace(/^#/, ''),
+                pages = $('div[data-role="page"]');
+            if (!document.getElementById(id)) {
+                return false;
+            }
+            pages.each(function() {
+                if (this.id === id) {
+                    this.style.display = 'block';
+                    document.title = $('#' + id + ' div[data-role="header"] h1').html();
+                } else {
+                    this.style.display = 'none';
+                }
+            });
+        });
+        var pages = $('div[data-role="page"]'),
+            id = window.location.hash.replace(/^#/, '');
+        pages.each(function() {
+            this.style.display = 'none';
+        });
+        if (id) {
+            document.title = $('#' + id + ' div[data-role="header"] h1').html();
+            document.getElementById(id).style.display = 'block';
+        } else {
+            $.mobile.changePage(pages.get(0).id);
+        }
+    };
+
     $.fn.hashchange = function(handler, eventName) {
         this.on('hashchange', handler, eventName);
         return this;
     };
-    
+
     $.mobile = {
 
-        changePage : function(el, id, handler) {
-            $.log(el, id, handler, 'change page');
-        },
-
-        slidePage : function(page) {
-            var l = historyState.length,
-            state = window.location.hash;
-            if (l === 0) {
-                historyState.push(state);
-                this.slidePageFrom(page);
-                return;
-            }
-            if (state === historyState[l - 2]) {
-                historyState.pop();
-                this.slidePageFrom(page);
-            } else if (state === '') {
-                historyState.push(state);
-                this.slidePageFrom(page);
-            } else {
-                historyState.push(state);
-                this.slidePageFrom(page);
-            }
-        },
-        
-        slidePageFrom : function(page, from) {
-            mainContainer.append(page);
-
-            page = $('#' + page.id);
-            
-    
-            if (!currentPage || !from) {
-                page.attr("class", "page center");
-                currentPage = page;
-                return;
-            }
-    
-            // Position the page at the starting position of the animation
-            page.attr("class", "page " + from);
-    
-            currentPage.one('webkitTransitionEnd', function(e) {
-                $(e.target).remove();
-            });
-    
-            // Force reflow. More information here: http://www.phpied.com/rendering-repaint-reflowrelayout-restyle/
-            mainContainer[0].offsetWidth;
-    
-            // Position the new page and the current page at the ending position of their animation with a transition class indicating the duration of the animation
-            page.attr("class", "page transition center");
-            currentPage.attr("class", "page transition " + (from === "left" ? "right" : "left"));
-            currentPage = page;    
+        changePage : function(id) {
+            window.location.hash = id;
         }
-
     };
 
-    mainContainer = $('div[data-role="main-container"]'); 
+    init();
 
 }(document, window));
