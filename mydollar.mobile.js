@@ -2,12 +2,31 @@
     "use strict";
     /*jslint browser:true, plusplus:true*/
     /*global $*/
-    var init;
+    var loaded = false,
+        init,
+        onHashChange;
 
     init = function() {
+        if (loaded === true) {
+            return;
+        }
+        loaded = true;
+        var pages = $('div[data-role="page"]'),
+            id = window.location.hash.replace(/^#/, '');
+        onHashChange(pages);
+        pages.each(function() {
+            this.style.display = 'none';
+        });
+        if (!id || !document.getElementById(id)) {
+            id = pages.get(0).id;
+        }
+        $.mobile.changePage('#');
+        setTimeout(function() { document.location.replace('#' + id); }, 1);
+    };
+
+    onHashChange = function(pages) {
         $(window).on('hashchange', function() {
-            var id = window.location.hash.replace(/^#/, ''),
-                pages = $('div[data-role="page"]');
+            var id = window.location.hash.replace(/^#/, '');
             if (!id || !document.getElementById(id)) {
                 return false;
             }
@@ -20,16 +39,6 @@
                 }
             });
         });
-        var pages = $('div[data-role="page"]'),
-            id = window.location.hash.replace(/^#/, '');
-        pages.each(function() {
-            this.style.display = 'none';
-        });
-        if (!id || !document.getElementById(id)) {
-            id = pages.get(0).id;
-        }
-        $.mobile.changePage('#' + $.uniqId);
-        $.mobile.changePage(id);
     };
 
     $.fn.hashchange = function(handler, eventName) {
@@ -40,9 +49,11 @@
     $.mobile = {
         changePage : function(id) {
             window.location.hash = id;
+        },
+
+        init : function() {
+            init();
         }
     };
-
-    init();
 
 }(document, window));
